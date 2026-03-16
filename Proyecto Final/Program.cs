@@ -1,5 +1,3 @@
-
-
 const int maxProducts = 100;
 string[] productNames = new string[maxProducts];
 double[] productPrices = new double[maxProducts];
@@ -65,6 +63,106 @@ void ListarProductos()
     }
 }
 
+void ActualizarStock()
+{
+    Console.Write("Ingrese el nombre del producto a actualizar: ");
+    string? name = Console.ReadLine();
+    if (string.IsNullOrWhiteSpace(name))
+    {
+        Console.WriteLine("El nombre del producto no puede estar vacío.");
+        return;
+    }
+
+    int index = Array.IndexOf(productNames, name);
+    if (index == -1)
+    {
+        Console.WriteLine("Producto no encontrado.");
+        return;
+    }
+
+    Console.Write("Ingrese la nueva cantidad en stock: ");
+    if (!int.TryParse(Console.ReadLine(), out int newStock))
+    {
+        Console.WriteLine("Cantidad inválida.");
+        return;
+    }
+
+    productStocks[index] = newStock;
+    Console.WriteLine("Stock actualizado exitosamente.");
+}
+
+void EliminarProducto()
+{
+    Console.Write("Ingrese el nombre del producto a eliminar: ");
+    string? name = Console.ReadLine();
+    if (string.IsNullOrWhiteSpace(name))
+    {
+        Console.WriteLine("El nombre del producto no puede estar vacío.");
+        return;
+    }
+
+    int index = Array.IndexOf(productNames, name);
+    if (index == -1)
+    {
+        Console.WriteLine("Producto no encontrado.");
+        return;
+    }
+
+    for (int i = index; i < productCount - 1; i++)
+    {
+        productNames[i] = productNames[i + 1];
+        productPrices[i] = productPrices[i + 1];
+        productStocks[i] = productStocks[i + 1];
+    }
+
+    productCount--;
+    Console.WriteLine("Producto eliminado exitosamente.");
+}
+
+void GenerarFactura()
+{
+    Console.WriteLine("\n--- Generar Factura ---");
+    double total = 0;
+
+    while (true)
+    {
+        Console.Write("Ingrese el nombre del producto (o 'fin' para terminar): ");
+        string? name = Console.ReadLine();
+        if (string.IsNullOrWhiteSpace(name) || name.ToLower() == "fin")
+        {
+            break;
+        }
+
+        int index = Array.IndexOf(productNames, name);
+        if (index == -1)
+        {
+            Console.WriteLine("Producto no encontrado.");
+            continue;
+        }
+
+        Console.Write("Ingrese la cantidad a comprar: ");
+        if (!int.TryParse(Console.ReadLine(), out int quantity) || quantity <= 0)
+        {
+            Console.WriteLine("Cantidad inválida.");
+            continue;
+        }
+
+        if (quantity > productStocks[index])
+        {
+            Console.WriteLine("Stock insuficiente.");
+            continue;
+        }
+
+        double subtotal = quantity * productPrices[index];
+        total += subtotal;
+        productStocks[index] -= quantity;
+
+        Console.WriteLine($"{productNames[index]} x{quantity} - Subtotal: {subtotal:C}");
+    }
+
+    Console.WriteLine($"\nTotal a pagar: {total:C}");
+}
+
 while (true)
 {
     MostrarMenu();
@@ -82,6 +180,15 @@ while (true)
             break;
         case "2":
             ListarProductos();
+            break;
+        case "3":
+            ActualizarStock();
+            break;
+        case "4":
+            EliminarProducto();
+            break;
+        case "5":
+            GenerarFactura();
             break;
         case "6":
             Console.WriteLine("Saliendo del sistema. ¡Gracias por usar La Tiendita!");
