@@ -1,4 +1,4 @@
-﻿Console.WriteLine("Hello, World!");
+
 
 const int maxProducts = 100;
 string[] productNames = new string[maxProducts];
