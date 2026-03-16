@@ -1,4 +1,8 @@
+using System.Globalization;
+
 const int maxProducts = 100;
+const int lowStockThreshold = 5;
+string inventoryFilePath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "inventario.txt"));
 string[] productNames = new string[maxProducts];
 double[] productPrices = new double[maxProducts];
 int[] productStocks = new int[maxProducts];
@@ -32,6 +36,15 @@ void RegistrarProducto()
         return;
     }
 
+    for (int i = 0; i < productCount; i++)
+    {
+        if (string.Equals(productNames[i], name, StringComparison.OrdinalIgnoreCase))
+        {
+            Console.WriteLine("Ese producto ya existe en el inventario.");
+            return;
+        }
+    }
+
     Console.Write("Ingrese el precio del producto: ");
     if (!double.TryParse(Console.ReadLine(), out double price))
     {
@@ -51,15 +64,35 @@ void RegistrarProducto()
     productStocks[productCount] = stock;
     productCount++;
 
+    using (StreamWriter writer = new StreamWriter(inventoryFilePath, false))
+    {
+        for (int i = 0; i < productCount; i++)
+        {
+            writer.WriteLine($"{productNames[i]}\t{productPrices[i].ToString(CultureInfo.InvariantCulture)}\t{productStocks[i]}");
+        }
+    }
+
     Console.WriteLine("Producto registrado exitosamente.");
+    if (productStocks[productCount - 1] < lowStockThreshold)
+    {
+        Console.WriteLine($"Alerta: el producto '{productNames[productCount - 1]}' tiene stock bajo ({productStocks[productCount - 1]} unidades).");
+    }
 }
 
 void ListarProductos()
 {
     Console.WriteLine("\n--- Inventario ---");
+
+    if (productCount == 0)
+    {
+        Console.WriteLine("No hay productos registrados.");
+        return;
+    }
+
     for (int i = 0; i < productCount; i++)
     {
-        Console.WriteLine($"{i + 1}. {productNames[i]} - Precio: {productPrices[i]:C} - Stock: {productStocks[i]}");
+        string alert = productStocks[i] < lowStockThreshold ? " [STOCK BAJO]" : string.Empty;
+        Console.WriteLine($"{i + 1}. {productNames[i]} - Precio: {productPrices[i]:C} - Stock: {productStocks[i]}{alert}");
     }
 }
 
@@ -73,7 +106,16 @@ void ActualizarStock()
         return;
     }
 
-    int index = Array.IndexOf(productNames, name);
+    int index = -1;
+    for (int i = 0; i < productCount; i++)
+    {
+        if (string.Equals(productNames[i], name, StringComparison.OrdinalIgnoreCase))
+        {
+            index = i;
+            break;
+        }
+    }
+
     if (index == -1)
     {
         Console.WriteLine("Producto no encontrado.");
@@ -88,7 +130,20 @@ void ActualizarStock()
     }
 
     productStocks[index] = newStock;
+
+    using (StreamWriter writer = new StreamWriter(inventoryFilePath, false))
+    {
+        for (int i = 0; i < productCount; i++)
+        {
+            writer.WriteLine($"{productNames[i]}\t{productPrices[i].ToString(CultureInfo.InvariantCulture)}\t{productStocks[i]}");
+        }
+    }
+
     Console.WriteLine("Stock actualizado exitosamente.");
+    if (productStocks[index] < lowStockThreshold)
+    {
+        Console.WriteLine($"Alerta: el producto '{productNames[index]}' tiene stock bajo ({productStocks[index]} unidades).");
+    }
 }
 
 void EliminarProducto()
@@ -101,7 +156,16 @@ void EliminarProducto()
         return;
     }
 
-    int index = Array.IndexOf(productNames, name);
+    int index = -1;
+    for (int i = 0; i < productCount; i++)
+    {
+        if (string.Equals(productNames[i], name, StringComparison.OrdinalIgnoreCase))
+        {
+            index = i;
+            break;
+        }
+    }
+
     if (index == -1)
     {
         Console.WriteLine("Producto no encontrado.");
@@ -116,6 +180,18 @@ void EliminarProducto()
     }
 
     productCount--;
+    productNames[productCount] = string.Empty;
+    productPrices[productCount] = 0;
+    productStocks[productCount] = 0;
+
+    using (StreamWriter writer = new StreamWriter(inventoryFilePath, false))
+    {
+        for (int i = 0; i < productCount; i++)
+        {
+            writer.WriteLine($"{productNames[i]}\t{productPrices[i].ToString(CultureInfo.InvariantCulture)}\t{productStocks[i]}");
+        }
+    }
+
     Console.WriteLine("Producto eliminado exitosamente.");
 }
 
@@ -133,7 +209,16 @@ void GenerarFactura()
             break;
         }
 
-        int index = Array.IndexOf(productNames, name);
+        int index = -1;
+        for (int i = 0; i < productCount; i++)
+        {
+            if (string.Equals(productNames[i], name, StringComparison.OrdinalIgnoreCase))
+            {
+                index = i;
+                break;
+            }
+        }
+
         if (index == -1)
         {
             Console.WriteLine("Producto no encontrado.");
@@ -158,9 +243,54 @@ void GenerarFactura()
         productStocks[index] -= quantity;
 
         Console.WriteLine($"{productNames[index]} x{quantity} - Subtotal: {subtotal:C}");
+        if (productStocks[index] < lowStockThreshold)
+        {
+            Console.WriteLine($"Alerta: el producto '{productNames[index]}' tiene stock bajo ({productStocks[index]} unidades).");
+        }
+    }
+
+    using (StreamWriter writer = new StreamWriter(inventoryFilePath, false))
+    {
+        for (int i = 0; i < productCount; i++)
+        {
+            writer.WriteLine($"{productNames[i]}\t{productPrices[i].ToString(CultureInfo.InvariantCulture)}\t{productStocks[i]}");
+        }
     }
 
     Console.WriteLine($"\nTotal a pagar: {total:C}");
+}
+
+if (File.Exists(inventoryFilePath))
+{
+    string[] lines = File.ReadAllLines(inventoryFilePath);
+    foreach (string line in lines)
+    {
+        if (string.IsNullOrWhiteSpace(line) || productCount >= maxProducts)
+        {
+            continue;
+        }
+
+        string[] parts = line.Split('\t');
+        if (parts.Length != 3)
+        {
+            continue;
+        }
+
+        if (!double.TryParse(parts[1], CultureInfo.InvariantCulture, out double price))
+        {
+            continue;
+        }
+
+        if (!int.TryParse(parts[2], out int stock))
+        {
+            continue;
+        }
+
+        productNames[productCount] = parts[0];
+        productPrices[productCount] = price;
+        productStocks[productCount] = stock;
+        productCount++;
+    }
 }
 
 while (true)
@@ -191,6 +321,14 @@ while (true)
             GenerarFactura();
             break;
         case "6":
+            using (StreamWriter writer = new StreamWriter(inventoryFilePath, false))
+            {
+                for (int i = 0; i < productCount; i++)
+                {
+                    writer.WriteLine($"{productNames[i]}\t{productPrices[i].ToString(CultureInfo.InvariantCulture)}\t{productStocks[i]}");
+                }
+            }
+
             Console.WriteLine("Saliendo del sistema. ¡Gracias por usar La Tiendita!");
             return;
         default:

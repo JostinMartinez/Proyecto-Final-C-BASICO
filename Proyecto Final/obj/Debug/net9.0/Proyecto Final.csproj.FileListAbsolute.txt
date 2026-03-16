@@ -1,0 +1,15 @@
+/workspaces/Proyecto-Final-C-BASICO/Proyecto Final/bin/Debug/net9.0/Proyecto Final
+/workspaces/Proyecto-Final-C-BASICO/Proyecto Final/bin/Debug/net9.0/Proyecto Final.deps.json
+/workspaces/Proyecto-Final-C-BASICO/Proyecto Final/bin/Debug/net9.0/Proyecto Final.runtimeconfig.json
+/workspaces/Proyecto-Final-C-BASICO/Proyecto Final/bin/Debug/net9.0/Proyecto Final.dll
+/workspaces/Proyecto-Final-C-BASICO/Proyecto Final/bin/Debug/net9.0/Proyecto Final.pdb
+/workspaces/Proyecto-Final-C-BASICO/Proyecto Final/obj/Debug/net9.0/Proyecto Final.GeneratedMSBuildEditorConfig.editorconfig
+/workspaces/Proyecto-Final-C-BASICO/Proyecto Final/obj/Debug/net9.0/Proyecto Final.AssemblyInfoInputs.cache
+/workspaces/Proyecto-Final-C-BASICO/Proyecto Final/obj/Debug/net9.0/Proyecto Final.AssemblyInfo.cs
+/workspaces/Proyecto-Final-C-BASICO/Proyecto Final/obj/Debug/net9.0/Proyecto Final.csproj.CoreCompileInputs.cache
+/workspaces/Proyecto-Final-C-BASICO/Proyecto Final/obj/Debug/net9.0/Proyecto Final.sourcelink.json
+/workspaces/Proyecto-Final-C-BASICO/Proyecto Final/obj/Debug/net9.0/Proyecto Final.dll
+/workspaces/Proyecto-Final-C-BASICO/Proyecto Final/obj/Debug/net9.0/refint/Proyecto Final.dll
+/workspaces/Proyecto-Final-C-BASICO/Proyecto Final/obj/Debug/net9.0/Proyecto Final.pdb
+/workspaces/Proyecto-Final-C-BASICO/Proyecto Final/obj/Debug/net9.0/Proyecto Final.genruntimeconfig.cache
+/workspaces/Proyecto-Final-C-BASICO/Proyecto Final/obj/Debug/net9.0/ref/Proyecto Final.dll
